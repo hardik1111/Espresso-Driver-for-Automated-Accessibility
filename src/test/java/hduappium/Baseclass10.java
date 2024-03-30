@@ -75,7 +75,7 @@ public class Baseclass10 {
 	public AppiumDriverLocalService appiumService;
 	private LocalDateTime timestamp;
 	
-	static { System.load("C:/Users/hdu/eclipse/opencv/build/java/x64/opencv_java490.dll"); }
+	static { System.load("C:/Users/hdu/eclipse/Espresso_Integration/opencv/build/java/x64/opencv_java490.dll"); }
 	
 	public void ConfigureAppium() throws MalformedURLException
 	{
