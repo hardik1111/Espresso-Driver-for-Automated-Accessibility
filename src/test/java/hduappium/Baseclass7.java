@@ -1,17 +1,28 @@
 package hduappium;
 
+import java.awt.Color;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.imageio.ImageIO;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -275,6 +286,77 @@ public class Baseclass7 {
 
         return violations;
     }
+    public List<AccessibilityViolation> checkColorContrast(List<WebElement> elements) throws IOException {
+        List<AccessibilityViolation> violations = new ArrayList<>();
+        File screenshot = driver.getScreenshotAs(OutputType.FILE);
+        BufferedImage fullImg = ImageIO.read(screenshot);
+        int i=0;
+        for (WebElement element : elements) {
+           
+        	Point point = element.getLocation();
+        	int elementWidth = element.getSize().getWidth();
+        	int elementHeight = element.getSize().getHeight();
+        	BufferedImage elementScreenshot = fullImg.getSubimage(point.getX(), point.getY(), elementWidth, elementHeight);
+        	BufferedImage croppedImage = getCroppedImage(elementScreenshot);
+        	File outputFile = new File("C:/Users/hdu/eclipse/Espresso_Integration/src/test/java/Screenshots/element_screenshot"+i+".png");
+        	try {
+        	    ImageIO.write(croppedImage, "png", outputFile);
+        	    System.out.println("Saved element screenshot to " + outputFile.getAbsolutePath());
+        	} catch (IOException e) {
+        	    System.err.println("Error while saving the element screenshot: " + e.getMessage());
+        	}
+        	Map<Integer, Integer> colorMap = new HashMap<>();
+        	for (int x = 0; x < croppedImage.getWidth(); x++) {
+        	    for (int y = 0; y < croppedImage.getHeight(); y++) {
+        	        int rgb = croppedImage.getRGB(x, y);
+        	        colorMap.put(rgb, colorMap.getOrDefault(rgb, 0) + 1);
+        	    }
+        	}
+
+        	List<Entry<Integer, Integer>> sortedColors = new ArrayList<>(colorMap.entrySet());
+        	sortedColors.sort(Entry.comparingByValue(Comparator.reverseOrder()));
+
+        	int mostCommonColor = sortedColors.get(0).getKey();
+        	int secondMostCommonColor = sortedColors.get(1).getKey();
+
+        	/*int centerX = elementWidth / 2;
+        	int centerY = elementHeight / 2;
+        	int foregroundRGB = croppedImage.getRGB(centerX, centerY);*/
+        	Color foregroundColor = new Color(secondMostCommonColor);
+        	
+        	
+        	/*int edgeX = 10; // or elementWidth - 1 for the right edge
+        	int edgeY = 10; // or for the bottom edge
+        	int backgroundRGB = croppedImage.getRGB(edgeX, edgeY);*/
+        	Color backgroundColor = new Color(mostCommonColor);
+        	//int borderWidth = (int) (elementWidth * 0.36);//Math.max(1, Math.min(elementWidth, elementHeight) / 20); // 5% of the smaller dimension
+        	
+        	
+        	//Color backgroundColor = getBorderColor(elementScreenshot,borderWidth);
+        	double contrastRatio = calculateContrastRatio(foregroundColor, backgroundColor);
+        	boolean contrastIsSufficient;
+        	if(contrastRatio < 4.5)
+        	{
+        		contrastIsSufficient = false;
+        	}
+        	else
+        	{
+        		contrastIsSufficient = true;
+        	}
+        	
+            if (!contrastIsSufficient) {
+                violations.add(new AccessibilityViolation(
+                    element.getText(),
+                    "Insufficient Color Contrast",
+                    "Element has insufficient color contrast between text and background."
+                ));
+            }
+            
+            i++;
+        }
+
+        return violations;
+    }
     
     public boolean changeFontSize(AppiumDriver driver, float d) {
 	    try {
@@ -355,11 +437,54 @@ public void generateAccessibilityReport(List<AccessibilityViolation> violations)
 		return price;
 		
 	}
+	
 	@AfterClass
 	public void tearDown()
 	{
 		driver.quit();
 		appiumService.stop();
+	}
+	
+	private double linearize(double value) {
+	    return (value <= 0.03928) ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4);
+	}
+
+	private double getLuminance(Color color) {
+	    double r = linearize(color.getRed() / 255.0);
+	    double g = linearize(color.getGreen() / 255.0);
+	    double b = linearize(color.getBlue() / 255.0);
+	    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+	}
+
+	private double calculateContrastRatio(Color foreground, Color background) {
+	    double luminance1 = getLuminance(foreground) + 0.05;
+	    double luminance2 = getLuminance(background) + 0.05;
+	    return (luminance1 > luminance2) ? (luminance1 / luminance2) : (luminance2 / luminance1);
+	} 
+	
+	private BufferedImage getCroppedImage(BufferedImage image)
+	{
+		int minX = Integer.MAX_VALUE;
+		int minY = Integer.MAX_VALUE;
+		int maxX = 0;
+		int maxY = 0;
+
+		for (int x = 0; x < image.getWidth(); x++) {
+		    for (int y = 0; y < image.getHeight(); y++) {
+		        if (image.getRGB(x, y) != Color.WHITE.getRGB()) {
+		            if (x < minX) minX = x;
+		            if (x > maxX) maxX = x;
+		            if (y < minY) minY = y;
+		            if (y > maxY) maxY = y;
+		        }
+		    }
 		}
+		
+		BufferedImage croppedImage= image.getSubimage(minX, minY, maxX - minX + 1, maxY - minY + 1);
+		return croppedImage;
+	}
+	
+	
+	
 	
 }

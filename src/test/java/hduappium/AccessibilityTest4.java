@@ -120,9 +120,18 @@ public class AccessibilityTest4 extends Baseclass7 {
          allViolations.addAll(checkFocusability(combinedList_Focusable));
          allViolations.addAll(checkTextVisibilityAndReadability(combinedList_checkVisibility));
          allViolations.addAll(checkInteractiveElementStates(combinedList_interactiveElement));
+         allViolations.addAll(checkColorContrast(combinedList_Colorcontrast));
          
          boolean r= changeFontSize(driver,1.5f);
          if(r==true)
+         {
+         	List<WebElement> textViews_fortextscale = driver.findElements(By.xpath("//android.widget.TextView"));
+         	System.out.println(textViews.size()+"-------------------------------------------------------------------------------------------------------------------------");
+         	allViolations.addAll(checkTextScalingAdaptation(textViews_fortextscale));
+         }
+         
+         boolean r1= changeFontSize(driver,0.9f);
+         if(r1==true)
          {
          	List<WebElement> textViews_fortextscale = driver.findElements(By.xpath("//android.widget.TextView"));
          	System.out.println(textViews.size()+"-------------------------------------------------------------------------------------------------------------------------");

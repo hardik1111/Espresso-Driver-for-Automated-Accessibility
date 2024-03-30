@@ -17,6 +17,7 @@ import org.testng.annotations.BeforeClass;
 import com.google.common.collect.ImmutableMap;
 
 import io.appium.java_client.AppiumBy;
+import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.Activity;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.options.UiAutomator2Options;
@@ -76,7 +77,8 @@ public class Baseclass5 {
                 .withAppiumJS(new File("C:\\Users\\hdu\\AppData\\Roaming\\npm\\node_modules\\appium\\build\\lib\\main.js")) // Path to Appium's main.js file on Windows
                 .withLogFile(new File("appium.log")) // Optional: Set log file path
                 .withArgument(GeneralServerFlag.LOCAL_TIMEZONE) 
-                .withArgument(GeneralServerFlag.LOG_LEVEL, "info"); // Optional: Set log level
+                .withArgument(GeneralServerFlag.LOG_LEVEL, "info")
+                .withArgument(() -> "--allow-insecure", "adb_shell"); // Optional: Set log level
 
         
         appiumService = AppiumDriverLocalService.buildService(builder);
@@ -85,7 +87,7 @@ public class Baseclass5 {
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, "Android");
         capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "Pixel 6 API 33");
-        capabilities.setCapability(MobileCapabilityType.APP, "C:/Users/hdu/eclipse/Appium/src/test/java/resources/standard-366-standard4-prod.apk");
+        capabilities.setCapability(MobileCapabilityType.APP, "C:/Users/hdu/eclipse/Espresso_Integration/src/test/java/resources/ApiDemos-debug.apk");
         capabilities.setCapability("automationName", "UiAutomator2");
         
         capabilities.setCapability(MobileCapabilityType.NO_RESET, true);
@@ -146,6 +148,33 @@ public class Baseclass5 {
 		return price;
 		
 	}
+	
+	public boolean changeFontSize(AppiumDriver driver, float d) {
+	    try {
+	        // Command to change the font size
+	        String changeCommand = String.format("settings put system font_scale %s", d);
+	        driver.executeScript("mobile: shell", ImmutableMap.of("command", changeCommand));
+
+	        // Give the system a moment to apply the change
+	        Thread.sleep(1000); // Adjust sleep time as necessary
+
+	        // Command to retrieve the current font size setting
+	        String getCommand = "settings get system font_scale";
+	        String currentScale = (String) driver.executeScript("mobile: shell", ImmutableMap.of("command", getCommand));
+
+	        // Check if the font size change was successful
+	        if (Float.parseFloat(currentScale.trim()) == d) {
+	            return true; // Successfully changed the font size
+	        } else {
+	            System.err.println("Font size did not change as expected.");
+	            return false; // Failed to change the font size
+	        }
+	    } catch (Exception e) {
+	        System.err.println("Failed to execute font scale change command: " + e.getMessage());
+	        return false; // Exception occurred, indicating failure
+	    }
+	}
+	
 	@AfterClass
 	public void tearDown()
 	{

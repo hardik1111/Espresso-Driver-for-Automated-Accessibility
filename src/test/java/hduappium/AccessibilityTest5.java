@@ -4,8 +4,10 @@ import static org.testng.Assert.assertNotNull;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
@@ -43,26 +45,41 @@ import io.appium.java_client.service.local.flags.GeneralServerFlag;
 
 public class AccessibilityTest5  {
 	
-	public static void main(String[] args) {
+	public static int getDeviceDpi() throws IOException, NumberFormatException {
+        Process process = Runtime.getRuntime().exec("adb shell wm density");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String line;
+        int dpi = 0;
+        while ((line = reader.readLine()) != null) {
+            if (line.contains("Physical density:")) {
+                dpi = Integer.parseInt(line.replaceAll("[^0-9]", ""));
+                break;
+            }
+        }
+        reader.close();
+        
+        // Ensure the process completes and the input stream is closed
         try {
-            // Set up desired capabilities
-            DesiredCapabilities caps = new DesiredCapabilities();
-            caps.setCapability("platformName", "Android");
-            caps.setCapability("deviceName", "Pixel 6 API 33"); // Replace with your device name or emulator
-            caps.setCapability("automationName", "Espresso");
-            caps.setCapability("app", "C:/Users/hdu/eclipse/Espresso_Integration/src/test/java/resources/ApiDemos-debug.apk");
-            caps.setCapability("appPackage", "io.appium.android.apis"); 
-            // Replace with your app's package name
-            // Replace with app's MainActivity
+            process.waitFor();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt(); // Set the interrupt flag again
+            throw new IOException("Interrupted while waiting for the dpi command to complete.", e);
+        }
 
-            // Initialize the Appium driver (Make sure Appium server is running)
-            AppiumDriver driver = new AndroidDriver(new URL("http://127.0.0.1:4723"), caps);
+        if (dpi == 0) {
+            throw new IOException("Failed to retrieve device DPI. ADB command might not have executed properly.");
+        }
 
-           
-            // Quit the driver
-            driver.quit();
-        } catch (Exception e) {
+        return dpi;
+    }
+    
+    public static void main(String[] args) {
+        try {
+            float dpi = (float)getDeviceDpi();
+            System.out.println("Device DPI: " + dpi);
+        } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
+            System.err.println("Failed to retrieve device DPI.");
         }
     }
     	

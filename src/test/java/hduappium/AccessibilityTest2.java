@@ -74,7 +74,7 @@ public class AccessibilityTest2 extends Baseclass5 {
         	int elementHeight = element.getSize().getHeight();
         	
         	BufferedImage elementScreenshot = fullImg.getSubimage(point.getX(), point.getY(), elementWidth, elementHeight);
-        		File outputFile = new File("C:/Users/hdu/eclipse/Appium/src/test/java/Screenshots/element_screenshot"+i+".png");
+        		File outputFile = new File("C:/Users/hdu/eclipse/Espresso_Integration/src/test/java/Screenshots/element_screenshot"+i+".png");
         	try {
         	    ImageIO.write(elementScreenshot, "png", outputFile);
         	    System.out.println("Saved element screenshot to " + outputFile.getAbsolutePath());
@@ -99,24 +99,24 @@ public class AccessibilityTest2 extends Baseclass5 {
 
     	// Get width and height of the element
 
-    	WebElement element = elements.get(0);
+    	WebElement element = elements.get(1);
     	//Crop the entire page screenshot to get only element screenshot
     	Point point = element.getLocation();
     	int elementWidth = element.getSize().getWidth();
     	int elementHeight = element.getSize().getHeight();
     	BufferedImage elementScreenshot = fullImg.getSubimage(point.getX(), point.getY(), elementWidth, elementHeight);
-    	BufferedImage croppedImage = getCroppedImage(elementScreenshot);
-    	File outputFile = new File("C:/Users/hdu/eclipse/Appium/src/test/java/Screenshots/element_screenshot.png");
+    	//BufferedImage croppedImage = getCroppedImage(elementScreenshot);
+    	File outputFile = new File("C:/Users/hdu/eclipse/Espresso_Integration/src/test/java/Screenshots/element_screenshot.png");
     	try {
-    	    ImageIO.write(croppedImage, "png", outputFile);
+    	    ImageIO.write(elementScreenshot, "png", outputFile);
     	    System.out.println("Saved element screenshot to " + outputFile.getAbsolutePath());
     	} catch (IOException e) {
     	    System.err.println("Error while saving the element screenshot: " + e.getMessage());
     	}
     	Map<Integer, Integer> colorMap = new HashMap<>();
-    	for (int x = 0; x < croppedImage.getWidth(); x++) {
-    	    for (int y = 0; y < croppedImage.getHeight(); y++) {
-    	        int rgb = croppedImage.getRGB(x, y);
+    	for (int x = 0; x < elementScreenshot.getWidth(); x++) {
+    	    for (int y = 0; y < elementScreenshot.getHeight(); y++) {
+    	        int rgb = elementScreenshot.getRGB(x, y);
     	        colorMap.put(rgb, colorMap.getOrDefault(rgb, 0) + 1);
     	    }
     	}
