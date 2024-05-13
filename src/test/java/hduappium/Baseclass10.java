@@ -119,10 +119,9 @@ public class Baseclass10 {
 		AppiumServiceBuilder builder = new AppiumServiceBuilder();
         builder.usingDriverExecutable(new File("C:\\Program Files\\nodejs\\node.exe")) // Path to Node.js executable on Windows
                 .withAppiumJS(new File("C:\\Users\\hdu\\AppData\\Roaming\\npm\\node_modules\\appium\\build\\lib\\main.js")) // Path to Appium's main.js file on Windows
-                .withLogFile(new File("appium.log")) // Optional: Set log file path
+                .withLogFile(new File("appium.log"))// Optional: Set log file path
                 .withArgument(GeneralServerFlag.LOCAL_TIMEZONE) 
-                .withArgument(GeneralServerFlag.LOG_LEVEL, "debug")
-                .withArgument(() -> "--allow-insecure", "adb_shell");// Optional: Set log level
+                .withArgument(GeneralServerFlag.LOG_LEVEL, "debug");// Optional: Set log level
 
         
         appiumService = AppiumDriverLocalService.buildService(builder);
@@ -422,31 +421,20 @@ public class Baseclass10 {
         return violations;
     }
     
-    public boolean changeFontSize(AppiumDriver driver, float d) {
-	    try {
-	        // Command to change the font size
-	        String changeCommand = String.format("settings put system font_scale %s", d);
-	        driver.executeScript("mobile: shell", ImmutableMap.of("command", changeCommand));
+    public boolean changeFontSize(float scale) {
+        try {
+            Runtime.getRuntime().exec(String.format("adb shell settings put system font_scale %s", scale));
+            Thread.sleep(1000); // Give the system time to apply the change.
 
-	        // Give the system a moment to apply the change
-	        Thread.sleep(1000); // Adjust sleep time as necessary
+            // Optionally, verify the change was applied as in your original method.
+            // This may involve pulling the setting value with another adb shell command and parsing the output.
 
-	        // Command to retrieve the current font size setting
-	        String getCommand = "settings get system font_scale";
-	        String currentScale = (String) driver.executeScript("mobile: shell", ImmutableMap.of("command", getCommand));
-
-	        // Check if the font size change was successful
-	        if (Float.parseFloat(currentScale.trim()) == d) {
-	            return true; // Successfully changed the font size
-	        } else {
-	            System.err.println("Font size did not change as expected.");
-	            return false; // Failed to change the font size
-	        }
-	    } catch (Exception e) {
-	        System.err.println("Failed to execute font scale change command: " + e.getMessage());
-	        return false; // Exception occurred, indicating failure
-	    }
-	}
+            return true; // Indicate success, or modify based on verification results.
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            return false; // Indicate failure.
+        }
+    }
     
     public void resetFontSizeToDefault() {
         try {

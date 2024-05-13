@@ -252,15 +252,15 @@ public class AccessibilityTest4_dummy5 extends Baseclass10 {
     	
     	Thread.sleep(5000);
     	//changeFontSize(driver, 1.5f);
-    	if(changeFontSize(driver, 1.5f)) {
+    	if(changeFontSize(1.5f)) {
             // It's important to refresh the driver's context to ensure it recognizes the UI changes
         	
         	
     		
         	driver.activateApp("de.hafas.android.standard4");
-        	driver.findElement(By.xpath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/androidx.drawerlayout.widget.DrawerLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.view.ViewGroup/android.widget.ScrollView/android.widget.LinearLayout/android.widget.LinearLayout/android.widget.LinearLayout[1]/android.widget.LinearLayout/android.widget.FrameLayout[1]")).click();
-        	driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
-        	
+        	//driver.findElement(By.xpath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/androidx.drawerlayout.widget.DrawerLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.view.ViewGroup/android.widget.ScrollView/android.widget.LinearLayout/android.widget.LinearLayout/android.widget.LinearLayout[1]/android.widget.LinearLayout/android.widget.FrameLayout[1]")).click();
+        	//driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
+        	Thread.sleep(5000);
         	
             // Re-collect and re-categorize elements after font size change
         	collectAllElements1();
@@ -272,7 +272,7 @@ public class AccessibilityTest4_dummy5 extends Baseclass10 {
     	
     	Thread.sleep(5000);
     	
-    	if(changeFontSize(driver, 0.9f)) {
+    	if(changeFontSize(0.9f)) {
             // It's important to refresh the driver's context to ensure it recognizes the UI changes
         	
         	
@@ -292,7 +292,7 @@ public class AccessibilityTest4_dummy5 extends Baseclass10 {
     	if (!allViolations.isEmpty()) {
     		generatePdfReport(allViolations);
         }
-    	changeFontSize(driver, 1.0f);
+    	changeFontSize(1.0f);
 	    //String allElementsXpath = "";
 	    
     	

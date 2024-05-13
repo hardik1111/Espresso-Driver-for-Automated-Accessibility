@@ -40,19 +40,21 @@ import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
 import io.appium.java_client.service.local.flags.GeneralServerFlag;
 
-
-public class AccessibilityViolation2 extends Baseclass7 {
+//Class to handle accessibility violation reports within an Appium testing context.
+public class AccessibilityViolation2  {
 	
-	private String screenshotPath;
-    private String violationType;
-    private String additionalDetails;
+	private String screenshotPath; // Path to the screenshot file of the accessibility violation
+    private String violationType; // Type of accessibility violation encountered
+    private String additionalDetails; // Additional details about the violation
 
+    // Constructor to initialize an instance of AccessibilityViolation with required details
     public AccessibilityViolation2(String screenshotPath, String violationType, String additionalDetails) {
         this.screenshotPath = screenshotPath;
         this.violationType = violationType;
         this.additionalDetails = additionalDetails;
     }
 
+    // Returns a string representation of the accessibility violation, useful for logging and reporting
     @Override
     public String toString() {
         return "Violation Type: " + violationType +
@@ -60,14 +62,17 @@ public class AccessibilityViolation2 extends Baseclass7 {
                ", Details: " + additionalDetails;
     }
     
+    // Getter for the path to the screenshot of the violated element
     public String getElementDescription() {
         return screenshotPath;
     }
 
+    // Getter for the type of accessibility violation
     public String getViolationType() {
         return violationType;
     }
 
+    // Getter for additional details about the accessibility violation
     public String getAdditionalDetails() {
         return additionalDetails;
     }
